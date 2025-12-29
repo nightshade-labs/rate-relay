@@ -19,16 +19,13 @@ The Rate Relay service is a lightweight price data relay that fetches cryptocurr
 - **Source**: Jupiter Price API v3
 - **Token Pair**: SOL/USDC
 - **Polling Interval**: 1-2 seconds (configurable)
-- **Timeout**: 5 seconds per request
 - **Error Handling**: Log errors but continue service operation
 - **Validation**: Is timestamp recent and does price make sense?
 
 ### 2.2 HTTP API
 
-- **Protocol**: HTTP/1.1
 - **Format**: REST API with JSON responses
 - **Port**: Configurable (default: 8080)
-- **CORS**: Enabled for all origins (configurable)
 
 ### 2.3 WebSocket API
 - Future feature
