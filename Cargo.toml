@@ -19,3 +19,4 @@ anyhow = "1"
 thiserror = "1"
 prometheus = "0.13"
 tower-http = { version = "0.5", features = ["cors"] }
+dotenvy = "0.15"

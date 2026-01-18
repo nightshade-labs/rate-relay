@@ -4,7 +4,6 @@ use reqwest::Client;
 use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::str::FromStr;
 
 use crate::config::FeedConfig;
 use crate::error::FeedError;
@@ -12,7 +11,7 @@ use crate::models::PriceData;
 
 use super::PriceFeed;
 
-const JUPITER_API_URL: &str = "https://api.jup.ag/price/v2";
+const JUPITER_API_URL: &str = "https://api.jup.ag/price/v3";
 
 // Token mint addresses on Solana
 const SOL_MINT: &str = "So11111111111111111111111111111111111111112";
@@ -23,20 +22,21 @@ pub struct JupiterFeed {
     client: Client,
     pair: String,
     base_mint: String,
+    #[allow(dead_code)]
     quote_mint: String,
     priority: u32,
     api_key: Option<String>,
 }
 
+/// Jupiter v3 API response format:
+/// { "So111...": { "usdPrice": 142.79, ... } }
 #[derive(Debug, Deserialize)]
-struct JupiterResponse {
-    data: HashMap<String, JupiterPriceData>,
+#[serde(rename_all = "camelCase")]
+struct JupiterPriceData {
+    usd_price: f64,
 }
 
-#[derive(Debug, Deserialize)]
-struct JupiterPriceData {
-    price: String,
-}
+type JupiterResponse = HashMap<String, JupiterPriceData>;
 
 impl JupiterFeed {
     pub fn new(config: &FeedConfig, client: Client) -> Self {
@@ -79,10 +79,8 @@ impl PriceFeed for JupiterFeed {
     }
 
     async fn fetch_price(&self) -> Result<PriceData, FeedError> {
-        let url = format!(
-            "{}?ids={}&vsToken={}",
-            JUPITER_API_URL, self.base_mint, self.quote_mint
-        );
+        // v3 API: https://api.jup.ag/price/v3?ids=<mint>
+        let url = format!("{}?ids={}", JUPITER_API_URL, self.base_mint);
 
         let mut request = self
             .client
@@ -96,11 +94,10 @@ impl PriceFeed for JupiterFeed {
         let response: JupiterResponse = request.send().await?.json().await?;
 
         let price_data = response
-            .data
             .get(&self.base_mint)
             .ok_or_else(|| FeedError::ParseError("Token not found in response".to_string()))?;
 
-        let price = Decimal::from_str(&price_data.price)
+        let price = Decimal::try_from(price_data.usd_price)
             .map_err(|e| FeedError::ParseError(format!("Invalid price format: {}", e)))?;
 
         if price <= Decimal::ZERO {

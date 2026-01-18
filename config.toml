@@ -2,18 +2,18 @@
 port = 8080
 staleness_threshold_secs = 30
 
-# Mock feed for testing (works without external API)
+# Jupiter feed - requires JUPITER_API_KEY in .env file
 [[feeds]]
-type = "mock"
+type = "jupiter"
 base_token = "SOL"
 quote_token = "USDC"
 interval_ms = 1500
 priority = 1
 enabled = true
 
-# Jupiter feed - requires JUPITER_API_KEY environment variable
+# Mock feed for testing (works without external API)
 [[feeds]]
-type = "jupiter"
+type = "mock"
 base_token = "SOL"
 quote_token = "USDC"
 interval_ms = 1500

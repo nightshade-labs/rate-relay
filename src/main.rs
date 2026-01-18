@@ -20,6 +20,9 @@ use crate::state::AppState;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    // Load environment variables from .env file
+    dotenvy::dotenv().ok();
+
     // Initialize logging
     tracing_subscriber::registry()
         .with(
