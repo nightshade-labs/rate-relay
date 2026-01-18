@@ -1,0 +1,39 @@
+[server]
+port = 8080
+staleness_threshold_secs = 30
+
+# Mock feed for testing (works without external API)
+[[feeds]]
+type = "mock"
+base_token = "SOL"
+quote_token = "USDC"
+interval_ms = 1500
+priority = 1
+enabled = true
+
+# Jupiter feed - requires JUPITER_API_KEY environment variable
+[[feeds]]
+type = "jupiter"
+base_token = "SOL"
+quote_token = "USDC"
+interval_ms = 1500
+priority = 2
+enabled = false
+
+# Stub feed - not yet implemented
+[[feeds]]
+type = "pyth"
+base_token = "SOL"
+quote_token = "USDC"
+interval_ms = 2000
+priority = 2
+enabled = false
+
+# Stub feed - not yet implemented
+[[feeds]]
+type = "binance"
+base_token = "SOL"
+quote_token = "USDT"
+interval_ms = 1000
+priority = 3
+enabled = false
