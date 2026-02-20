@@ -36,10 +36,21 @@ async fn main() -> anyhow::Result<()> {
 
     // Load configuration
     let config = Config::load("config.toml")?;
-    info!(port = config.server.port, "Configuration loaded");
+
+    let port = std::env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse::<u16>().ok())
+        .unwrap_or(config.server.port);
+
+    let staleness_threshold_secs = std::env::var("STALENESS_THRESHOLD_SECS")
+        .ok()
+        .and_then(|s| s.parse::<u64>().ok())
+        .unwrap_or(config.server.staleness_threshold_secs);
+
+    info!(port, "Configuration loaded");
 
     // Create shared state and metrics
-    let app_state = AppState::new(config.server.staleness_threshold_secs);
+    let app_state = AppState::new(staleness_threshold_secs);
     let metrics = Arc::new(Metrics::new());
 
     // Create HTTP client for all feeds
@@ -86,7 +97,7 @@ async fn main() -> anyhow::Result<()> {
     // Create and start HTTP server
     let router = create_router(app_state, metrics);
 
-    let addr = format!("0.0.0.0:{}", config.server.port);
+    let addr = format!("0.0.0.0:{}", port);
     let listener = tokio::net::TcpListener::bind(&addr).await?;
 
     info!(address = %addr, "HTTP server listening");
