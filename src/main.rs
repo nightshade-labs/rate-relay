@@ -97,7 +97,7 @@ async fn main() -> anyhow::Result<()> {
     // Create and start HTTP server
     let router = create_router(app_state, metrics);
 
-    let addr = format!("0.0.0.0:{}", port);
+    let addr = format!("[::]:{}", port);
     let listener = tokio::net::TcpListener::bind(&addr).await?;
 
     info!(address = %addr, "HTTP server listening");
