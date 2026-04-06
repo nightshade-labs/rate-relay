@@ -53,8 +53,12 @@ async fn main() -> anyhow::Result<()> {
     let app_state = AppState::new(staleness_threshold_secs);
     let metrics = Arc::new(Metrics::new());
 
-    // Create HTTP client for all feeds
-    let http_client = reqwest::Client::new();
+    // Create HTTP client for all feeds. A User-Agent is required because some
+    // upstream CDNs (e.g. CloudFront in front of api.jup.ag) reject requests
+    // without one with HTTP 403.
+    let http_client = reqwest::Client::builder()
+        .user_agent(concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")))
+        .build()?;
 
     // Spawn feed schedulers for enabled feeds
     let enabled_feeds: Vec<_> = config.feeds.iter().filter(|f| f.enabled).collect();
