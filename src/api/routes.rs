@@ -58,12 +58,17 @@ async fn get_price(
 ) -> impl IntoResponse {
     let pair = format!("{}/{}", base.to_uppercase(), quote.to_uppercase());
 
-    state.metrics.record_http_request(&format!("/api/v1/price/{}/{}", base, quote));
+    state
+        .metrics
+        .record_http_request(&format!("/api/v1/price/{}/{}", base, quote));
 
     match state.app_state.get_price(&pair).await {
         Some((price_data, fallback_used)) => {
             let response = PriceResponse::from_price_data(&price_data, fallback_used);
-            (StatusCode::OK, Json(serde_json::to_value(response).unwrap()))
+            (
+                StatusCode::OK,
+                Json(serde_json::to_value(response).unwrap()),
+            )
         }
         None => {
             let response = ErrorResponse {

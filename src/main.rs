@@ -57,7 +57,11 @@ async fn main() -> anyhow::Result<()> {
     // upstream CDNs (e.g. CloudFront in front of api.jup.ag) reject requests
     // without one with HTTP 403.
     let http_client = reqwest::Client::builder()
-        .user_agent(concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!(
+            env!("CARGO_PKG_NAME"),
+            "/",
+            env!("CARGO_PKG_VERSION")
+        ))
         .build()?;
 
     // Spawn feed schedulers for enabled feeds

@@ -25,7 +25,10 @@ impl Metrics {
         .unwrap();
 
         let fetch_errors = CounterVec::new(
-            Opts::new("price_fetch_errors_total", "Total number of failed price fetches"),
+            Opts::new(
+                "price_fetch_errors_total",
+                "Total number of failed price fetches",
+            ),
             &["source", "pair", "error_type"],
         )
         .unwrap();
@@ -75,7 +78,7 @@ impl Metrics {
             .with_label_values(&[source, pair])
             .set(chrono::Utc::now().timestamp() as f64);
 
-        if let Some(price_f64) = price.to_string().parse::<f64>().ok() {
+        if let Ok(price_f64) = price.to_string().parse::<f64>() {
             self.current_price
                 .with_label_values(&[source, pair])
                 .set(price_f64);
@@ -85,7 +88,6 @@ impl Metrics {
     pub fn record_fetch_error(&self, source: &str, pair: &str, error: &FeedError) {
         let error_type = match error {
             FeedError::HttpError(_) => "http",
-            FeedError::ParseError(_) => "parse",
             FeedError::InvalidData(_) => "invalid_data",
             FeedError::NotImplemented(_) => "not_implemented",
         };
