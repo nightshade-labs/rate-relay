@@ -82,9 +82,8 @@ impl AppState {
             .values()
             .any(|entry| is_fresh(&entry.data.timestamp, &now, &staleness_threshold))
     }
-
 }
 
 fn is_fresh(timestamp: &DateTime<Utc>, now: &DateTime<Utc>, threshold: &Duration) -> bool {
-    *now - *timestamp < *threshold
+    *timestamp <= *now + Duration::seconds(5) && *now - *timestamp < *threshold
 }

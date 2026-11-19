@@ -58,7 +58,11 @@ impl FeedConfig {
 
 impl Config {
     pub fn load<P: AsRef<Path>>(path: P) -> anyhow::Result<Self> {
-        let content = std::fs::read_to_string(path)?;
+        let content = match std::env::var("RATE_RELAY_CONFIG_TOML") {
+            Ok(content) => content,
+            Err(std::env::VarError::NotPresent) => std::fs::read_to_string(path)?,
+            Err(error) => return Err(error.into()),
+        };
         let config: Config = toml::from_str(&content)?;
         Ok(config)
     }

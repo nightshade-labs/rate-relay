@@ -1,0 +1,11 @@
+[server]
+port = 8080
+staleness_threshold_secs = 30
+
+[[feeds]]
+type = "jupiter"
+base_token = "ANT"
+quote_token = "USDC"
+interval_ms = 2500
+priority = 1
+enabled = true
